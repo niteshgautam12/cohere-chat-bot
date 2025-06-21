@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cohere Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #667eea, #764ba2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      background: white;
+      width: 90%;
+      max-width: 600px;
+      height: 85vh;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: #4b6cb7;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #f5f7fa;
+    }
+
+    .message {
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+
+    .message.user {
+      text-align: right;
+      color: #333;
+    }
+
+    .message.bot {
+      text-align: left;
+      color: #2e7d32;
+    }
+
+    .chat-input-area {
+      display: flex;
+      padding: 15px;
+      border-top: 1px solid #ddd;
+      background: #ffffff;
+    }
+
+    .chat-input-area input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      outline: none;
+      font-size: 1rem;
+    }
+
+    .chat-input-area button {
+      background: #4b6cb7;
+      color: white;
+      border: none;
+      margin-left: 10px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s ease;
+    }
+
+    .chat-input-area button:hover {
+      background: #5d77d6;
+    }
+
+    @media (max-width: 600px) {
+      .chat-header { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      💬 Cohere AI Chatbot
+    </div>
+
+    <div class="chat-messages" id="chatArea">
+      <!-- Chat history appears here -->
+    </div>
+
+    <div class="chat-input-area">
+      <input type="text" id="userInput" placeholder="Type your message..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const message = input.value.trim();
+      if (message === "") return;
+
+      const chatArea = document.getElementById("chatArea");
+      chatArea.innerHTML += `<div class="message user"><strong>You:</strong> ${message}</div>`;
+      input.value = "";
+
+      fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: message })
+      })
+      .then(res => res.json())
+      .then(data => {
+        chatArea.innerHTML += `<div class="message bot"><strong>Bot:</strong> ${data.reply}</div>`;
+        chatArea.scrollTop = chatArea.scrollHeight;
+      })
+      .catch(() => {
+        chatArea.innerHTML += `<div class="message bot"><strong>Bot:</strong> Something went wrong.</div>`;
+      });
+    }
+
+    // Send message on Enter key
+    document.getElementById("userInput").addEventListener("keypress", function (e) {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>
