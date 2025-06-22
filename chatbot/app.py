@@ -4,7 +4,7 @@ import cohere
 app = Flask(__name__)
 
 
-co = cohere.Client("sdaVY0z8BTcWjWC7NxlrrsgIUEdtsexhPIWU5mF0")
+co = cohere.Client("use your api key ")
 
 @app.route('/')
 def index():
